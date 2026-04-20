@@ -4,10 +4,10 @@ import { updateLastMemory } from "../services/hindsightService.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { helpful } = req.body;
+  const { helpful, memoryId } = req.body;
 
   try {
-    await updateLastMemory(helpful);
+    await updateLastMemory(memoryId, helpful);
     res.json({ status: "ok" });
   } catch (err) {
     res.status(500).json({ error: "Feedback failed" });

@@ -1,70 +1,95 @@
-import axios from "axios";
+import { HindsightClient } from '@vectorize-io/hindsight-client';
+import {
+  searchMemory as localSearch,
+  storeMemory as localStore,
+  updateLastMemory as localUpdate
+} from "../store/memorystore.js";
 
-const BASE = process.env.HINDSIGHT_BASE_URL;
-const API_KEY = process.env.HINDSIGHT_API_KEY;
+const client = new HindsightClient({
+  baseUrl: process.env.HINDSIGHT_BASE_URL,
+  apiKey: process.env.HINDSIGHT_API_KEY,
+  bankId: "default"
+});
+
+const COLLECTION = "fixwise";
 
 let lastMemoryId = null;
 
-// 🔍 Search similar incidents
+// 🔍 SEARCH MEMORY
 export async function searchMemory(query) {
   try {
-    const res = await axios.post(
-      `${BASE}/search`,
-      { query, top_k: 3 },
-      {
-        headers: { Authorization: `Bearer ${API_KEY}` }
-      }
-    );
+    const results = await client.recall(COLLECTION, query);
 
-    return res.data.results.map(r => ({
-      issue: r.metadata.issue,
-      fix: r.metadata.fix,
-      success: r.metadata.success
-    }));
+    return results
+  .map((r) => {
+    const meta = r.metadata || {};
+
+    return {
+      issue: meta.issue || r.content,
+      fix: meta.fix || r.content,
+      success: meta.success ?? null,
+      id: r.id
+    };
+  })
+  //remove empty
+  .filter(m => m.issue && m.fix)
+  //remove junk data (IMPORTANT)
+  .filter(m => !m.issue.match(/actor|iit|semester|movie/i));
 
   } catch (err) {
-    console.log("Hindsight search fallback");
-    return [];
+    console.error("Hindsight recall error:", err.message);
+    console.log("Using local fallback...");
+    return localSearch(query);
   }
 }
 
-// 💾 Store new memory
+
+// 💾 STORE MEMORY
 export async function storeMemory(data) {
   try {
-    const res = await axios.post(
-      `${BASE}/store`,
-      {
-        text: data.issue,
-        metadata: data
-      },
-      {
-        headers: { Authorization: `Bearer ${API_KEY}` }
+    const res = await client.retain(COLLECTION, {
+      content: `${data.issue} → ${data.fix}`, // 🔥 rich context
+      metadata: {
+        issue: data.issue,
+        fix: data.fix,
+        success: data.success,
+        timestamp: Date.now()
       }
-    );
+    });
 
-    lastMemoryId = res.data.id;
+    lastMemoryId = res.id; // 👈 store real ID
+    return res.id;
 
   } catch (err) {
-    console.log("Hindsight store failed");
+    console.error("Hindsight retain error:", err.message);
+
+    const id = localStore(data);
+    lastMemoryId = id;
+    return id;
   }
 }
 
-// 👍 Update feedback
-export async function updateLastMemory(helpful) {
-  if (!lastMemoryId) return;
 
+// 🔁 UPDATE FEEDBACK (IMPORTANT)
+export async function updateLastMemory(id, helpful) {
   try {
-    await axios.post(
-      `${BASE}/update`,
-      {
-        id: lastMemoryId,
-        metadata: { success: helpful }
-      },
-      {
-        headers: { Authorization: `Bearer ${API_KEY}` }
+    if (!id) return;
+
+    // ❗ Hindsight SDK doesn't support update yet
+    // So we STORE a new improved memory instead
+
+    await client.retain(COLLECTION, {
+      content: `Feedback update`,
+      metadata: {
+        id,
+        success: helpful,
+        updated: true,
+        timestamp: Date.now()
       }
-    );
-  } catch {
-    console.log("Feedback update failed");
+    });
+
+  } catch (err) {
+    console.error("Hindsight update fallback:", err.message);
+    localUpdate(id, helpful);
   }
 }

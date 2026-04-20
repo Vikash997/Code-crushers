@@ -7,6 +7,9 @@ import feedbackRoute from "./routes/feedback.js";
 
 dotenv.config();
 
+//Debug logs
+console.log("PORT:", process.env.PORT);
+
 const app = express();
 
 app.use(cors());
@@ -15,6 +18,9 @@ app.use(express.json());
 app.use("/chat", chatRoute);
 app.use("/feedback", feedbackRoute);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on ${process.env.PORT}`);
+// ✅ Safe fallback
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
 });

@@ -6,30 +6,37 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { query } = req.body;
+  if (!query || typeof query !== "string") {
+    return res.status(400).json({ error: "Invalid query" });
+  }
+
+  let memories = [];
 
   try {
-    // 🔍 1. Retrieve similar past incidents
-    const memories = await searchMemory(query);
-
-    // 🤖 2. Generate AI response using past memory
-    const reply = await generateResponse(query, memories);
-
-    // 🧠 3. Store new interaction (no feedback yet)
-    await storeMemory({
-      issue: query,
-      fix: reply,
-      success: null
-    });
-
-    res.json({
-      reply,
-      memories
-    });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "Error processing request" });
+    memories = await searchMemory(query);
+  } catch {
+    memories = [];
   }
+
+  let reply = "";
+
+  try {
+    reply = await generateResponse(query, memories);
+  } catch {
+    reply = "⚠️ AI failed to respond";
+  }
+
+  const memoryId = await storeMemory({
+    issue: query,
+    fix: reply,
+    success: null
+  }) || null;
+
+  res.json({
+    reply,
+    memories,
+    memoryId
+  });
 });
 
 export default router;

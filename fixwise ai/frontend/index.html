@@ -8,37 +8,154 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/styles.css">
 </head>
+<span class="text-yellow-400 text-xs ml-2">⚡ Fast Response</span>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
 
-<body class="bg-gray-900 text-white">
-
-<div class="flex h-screen">
+<div class="flex h-screen max-w-7xl mx-auto">
 
   <!-- Sidebar -->
-  <div class="w-1/4 bg-gray-800 p-4 overflow-y-auto">
-    <h2 class="text-xl font-bold mb-4">🧠 Memory</h2>
+  <div class="w-1/4 bg-gray-800/70 backdrop-blur-md p-4 overflow-y-auto border-r border-gray-700">
+    
+    <h2 class="text-xl font-bold mb-2">🧠 Memory</h2>
+
+    <!-- Clear Memory -->
+    <button class="bg-red-500 text-xs px-2 py-1 rounded mb-3">
+      Clear Memory
+    </button>
+<div class="bg-yellow-500/10 text-yellow-300 p-2 rounded text-xs mb-3">
+  ⚠️ Tips: Describe your issue clearly for better solutions
+</div>
+<h3 class="text-sm text-gray-400 mt-4 mb-2">⚙️ I can help with:</h3>
+<ul class="text-xs space-y-1 text-gray-300">
+  <li>• Laptop speed issues</li>
+  <li>• Software errors</li>
+  <li>• Internet problems</li>
+</ul>
+    <!-- Memory List -->
     <div id="memoryPanel" class="space-y-3 text-sm text-gray-300">
       <p>No past incidents yet.</p>
     </div>
-  </div>
-
-  <!-- Chat -->
-  <div class="flex flex-col flex-1">
-
-    <div class="p-4 border-b border-gray-700 flex justify-between">
-      <h1 class="text-xl font-bold">⚡ FixWise AI</h1>
-      <span class="text-sm text-green-400">Learning Enabled</span>
+<hr class="border-gray-700 my-3">
+    <!-- Suggestions -->
+    <h3 class="text-sm text-gray-400 mt-6 mb-2">💡 Suggestions</h3>
+    <div class="space-y-2 text-xs">
+      <p class="bg-gray-700 p-2 rounded">Fix slow laptop</p>
+      <p class="bg-gray-700 p-2 rounded">Internet issue</p>
     </div>
 
-    <div id="chat" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+  </div>
 
-    <div class="p-4 flex gap-2 border-t border-gray-700">
-      <input id="input" class="flex-1 p-2 rounded bg-gray-700" />
-      <button id="sendBtn" class="bg-blue-500 px-4 py-2 rounded">Send</button>
+  <!-- Chat Section -->
+  <div class="flex flex-col flex-1 rounded-xl overflow-hidden shadow-2xl">
+
+    <!-- Header -->
+    <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800/70 backdrop-blur-md">
+      
+      <div>
+        <h1 class="text-xl font-bold">
+          ⚡ FixWise AI 
+          <span class="text-green-400 text-xs ml-2">● Online</span>
+        </h1>
+        <p class="text-xs text-gray-400">AI Assistant • Always Learning</p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex gap-2 items-center">
+
+        <button id="clearChat" class="bg-red-500 px-3 py-1 rounded text-sm">
+          Clear
+        </button>
+
+        <button id="exportChat" class="bg-green-500 px-3 py-1 rounded text-sm">
+          Export
+        </button>
+
+        <button id="themeToggle" class="bg-gray-600 px-3 py-1 rounded text-sm">
+          🌙
+        </button>
+
+        <!-- Profile -->
+        <div class="flex items-center gap-2 ml-2">
+          <img src="https://i.pravatar.cc/30" class="w-8 h-8 rounded-full"/>
+          <span class="text-sm">User</span>
+        </div>
+
+      </div>
+    </div>
+<div class="bg-gray-800 p-3 rounded-lg text-sm text-gray-300">
+  👋 Welcome! I can help fix your tech problems.
+</div>
+    <!-- Chat Box -->
+    <div id="chat" class="flex flex-col flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
+
+      <!-- Empty State -->
+      <div id="emptyState" class="text-center text-gray-500 mt-20">
+        🤖 Ask me anything about your problem
+      </div>
+
+      <!-- Quick Suggestions -->
+      <div class="flex gap-2 flex-wrap mb-3">
+        <button class="bg-gray-700 px-2 py-1 rounded text-xs">Laptop slow</button>
+        <button class="bg-gray-700 px-2 py-1 rounded text-xs">WiFi issue</button>
+        <button class="bg-gray-700 px-2 py-1 rounded text-xs">App crash</button>
+      </div>
+
+    </div>
+
+    <!-- Typing Indicator -->
+    <div id="typing" class="hidden px-4 pb-2">
+  <div class="flex gap-1">
+    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></span>
+    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></span>
+  </div>
+</div>
+
+    <!-- Input Section -->
+    <div class="p-4 flex gap-2 border-t border-gray-700 bg-gray-800/70 backdrop-blur-md">
+
+      <!-- Mic -->
+      <button class="bg-purple-500 px-3 py-2 rounded">🎤</button>
+
+
+      <!-- File Upload -->
+      <button onclick="document.getElementById('fileUpload').click()" 
+      class="bg-gray-700 px-3 py-2 rounded">📎</button>
+
+      <input type="file" id="fileUpload" class="hidden">
+
+
+      <!-- Input -->
+      <input id="input" placeholder="Type your issue..." 
+      class="flex-1 p-2 rounded bg-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+<p class="text-xs text-gray-500 px-2">
+  Press <kbd class="bg-gray-700 px-1 rounded">Enter</kbd> to send
+</p>
+      <!-- Send -->
+      <button id="sendBtn" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 active:scale-95 transition">
+        ➤
+      </button>
+
     </div>
 
   </div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<!-- Footer -->
+<div class="text-center text-xs text-gray-500 py-2 border-t border-gray-700">
+  © 2026 FixWise AI • Built by You 🚀
+</div>
+<p class="text-xs text-gray-500">
+  ⚡ Powered by AI • Responses may vary
+</p>
+<script src="js/main.js"></script>
 </body>
+<div id="helpBox" class="hidden fixed bottom-5 right-5 bg-gray-800 p-3 rounded text-xs">
+  ⌨️ Shortcuts:
+  <br>Enter → Send
+  <br>Ctrl + K → Focus Input
+</div>
+<button class="fixed bottom-20 right-5 bg-blue-500 w-12 h-12 rounded-full text-xl shadow-lg">
+  +
+</button>
 </html>
